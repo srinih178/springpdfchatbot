@@ -29,6 +29,7 @@
         
         #response {
             margin-top: 20px;
+			font-size: 14px;
             background: rgb(223, 232, 240);
             padding: 15px;
 			width: 500px;
@@ -37,18 +38,21 @@
 </head>
 <body>
     <h1>PDF Chatbot</h1>
-    <h5>Upload a PDF file to extract text and chat with the bot.</h5>
+    <h5>Upload a PDF file</h5>
 
     <!-- PDF Upload Section -->
     <input type="file" id="pdfFile" accept=".pdf">
-	<br><br>
-    <button onclick="uploadPdf()">Upload PDF</button
-	<br><br><br>
+	<br>
+	 <h5><input type="checkbox" id = "showpdfcontent"/>Show PDF content</h5>
 	
+    <button onclick="uploadPdf()">Upload PDF</button
+	<br><br>
+		
 	<!-- Display extracted text and chatbot response -->
 	<div id="status" style="font-size: 12px"></div>
 	<div id="message" style="font-size: 12px"></div>
-	<div id="extractedText" style="font-size: 12px"></div>
+	
+	<textarea id="extractedText" style="font-size: 12px; width: 700px; height: 100px; display: none;"></textarea>
 
     <!-- Text Input for Chatbot -->
 	<h3>Ask a Question:</h3>
@@ -68,6 +72,7 @@
             const fileInput = document.getElementById('pdfFile');
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
+			document.getElementById('extractedText').style.display = 'hidden';
 			
             fetch("/api/chatbot/upload-pdf", {
                 method: "POST",
@@ -77,7 +82,12 @@
             .then(data => {
 				const pdfResp = JSON.parse(data);
 				document.getElementById('message').innerText = pdfResp.message;
-                document.getElementById('extractedText').innerText = pdfResp.content;
+				
+				const showPdfcheckbox = document.getElementById('showpdfcontent');
+				if (showPdfcheckbox.checked) {
+					document.getElementById('extractedText').style.display = 'block';
+	                document.getElementById('extractedText').innerText = pdfResp.content;
+				}
             })
             .catch(error => {
                 console.error('Error:', error);
