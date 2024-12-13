@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        button {
+			display: inline-block;
+			padding: 12px 24px;
+			font-size: 15px;
+			font-weight: bold;
+			color: white;
+			background: linear-gradient(45deg, rgb(0, 128, 255), #2575fc);
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			text-decoration: none;
+			text-align: center;
+			transition: transform 0.2s ease, box-shadow 0.2s ease;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        #response {
+            margin-top: 20px;
+            background: rgb(223, 232, 240);
+            padding: 15px;
+			width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Chatbot</h1>
+    <h5>Upload a PDF file to extract text and chat with the bot.</h5>
+
+    <!-- PDF Upload Section -->
+    <input type="file" id="pdfFile" accept=".pdf">
+	<br><br>
+    <button onclick="uploadPdf()">Upload PDF</button
+	<br><br><br>
+	
+	<!-- Display extracted text and chatbot response -->
+	<div id="status" style="font-size: 12px"></div>
+	<div id="message" style="font-size: 12px"></div>
+	<div id="extractedText" style="font-size: 12px"></div>
+
+    <!-- Text Input for Chatbot -->
+	<h3>Ask a Question:</h3>
+    <textarea id="userMessage" placeholder="Type your question here..." style="width: 500px; height: 70px"></textarea>
+	<br><br>
+
+    <button onclick="sendMessage()">Get Answer</button>
+	<br><br>
+	<div id="generatestatus" style="font-size: 12px; padding: 15px; display: none;"></div>
+	
+    <h4>Chatbot Response:</h4>
+    <div id="response"></div>
+
+    <script>
+        // Upload PDF and display extracted text
+        function uploadPdf() {
+            const fileInput = document.getElementById('pdfFile');
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+			
+            fetch("/api/chatbot/upload-pdf", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+				const pdfResp = JSON.parse(data);
+				document.getElementById('message').innerText = pdfResp.message;
+                document.getElementById('extractedText').innerText = pdfResp.content;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Send a message to the chatbot
+        function sendMessage() {
+            const userMessage = document.getElementById('userMessage').value;
+            const messageData = { question: userMessage };
+			document.getElementById('generatestatus').style.display = 'block';
+			document.getElementById('generatestatus').innerText = "Fetching the Answer....";
+			
+            fetch("/api/chatbot/ask", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(messageData)
+            })
+            .then(response => response.text())
+            .then(data => {
+				document.getElementById('generatestatus').style.display = 'none';
+				const responseJson = JSON.parse(data);
+                document.getElementById('response').innerText = responseJson.answer;
+            })
+            .catch(error => {
+				document.getElementById('generatestatus').innerText = error;
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
