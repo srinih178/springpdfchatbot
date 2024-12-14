@@ -37,7 +37,7 @@
     </style>
 </head>
 <body>
-    <h1>PDF Chatbot</h1>
+    <h2>PDF Chatbot</h2>
     <h5>Upload a PDF file</h5>
 
     <!-- PDF Upload Section -->
@@ -50,19 +50,19 @@
 		
 	<!-- Display extracted text and chatbot response -->
 	<div id="status" style="font-size: 12px"></div>
+	<br>
 	<div id="message" style="font-size: 12px"></div>
-	
-	<textarea id="extractedText" style="font-size: 12px; width: 700px; height: 100px; display: none;"></textarea>
+	<div id="extractedText" style="white-space: pre; overflow: auto; padding: 10px; border: 1px solid #ccc; font-size: 12px; width: 600px; height: 60px; display: none;"></div>
 
     <!-- Text Input for Chatbot -->
 	<h3>Ask a Question:</h3>
-    <textarea id="userMessage" placeholder="Type your question here..." style="width: 500px; height: 70px"></textarea>
+    <textarea id="userMessage" placeholder="Type your question here..." style="width: 600px; height: 70px"></textarea>
 	<br><br>
 
     <button onclick="sendMessage()">Get Answer</button>
 	<br><br>
-	<div id="generatestatus" style="font-size: 12px; padding: 15px; display: none;"></div>
-	
+	<div id="generatestatus" style="font-size: 14px; padding: 15px; display: none;"></div>
+	<br>
     <h4>Chatbot Response:</h4>
     <div id="response"></div>
 
@@ -72,7 +72,7 @@
             const fileInput = document.getElementById('pdfFile');
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
-			document.getElementById('extractedText').style.display = 'hidden';
+			document.getElementById('extractedText').style.display = 'none';
 			
             fetch("/api/chatbot/upload-pdf", {
                 method: "POST",
@@ -99,6 +99,7 @@
             const userMessage = document.getElementById('userMessage').value;
             const messageData = { question: userMessage };
 			document.getElementById('generatestatus').style.display = 'block';
+			document.getElementById('response').innerText = '';
 			document.getElementById('generatestatus').innerText = "Fetching the Answer....";
 			
             fetch("/api/chatbot/ask", {
